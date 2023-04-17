@@ -7,6 +7,7 @@
     "version": "0.0.1",
     "scripts": {
         "dev": "vite dev",
+        "page": "vite build",
         "build": "svelte-kit sync && svelte-package",
         "prepublishOnly": "echo 'Did you mean to publish `./package/`, instead of `./`?' && exit 1",
         "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
@@ -19,7 +20,7 @@
         "svelte": "^3.54.0"
     },
     "devDependencies": {
-        "@sveltejs/adapter-auto": "^1.0.0",
+        "@sveltejs/adapter-static": "^1.0.0",
         "@sveltejs/kit": "^1.0.0",
         "@sveltejs/package": "^1.0.0",
         "eslint": "^8.28.0",
