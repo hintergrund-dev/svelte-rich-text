@@ -1,8 +1,8 @@
 import type { Writable } from 'svelte/store';
 
-export type RichObject = ParentNode[];
+export type RichObject = TextNode[];
 
-export type ParentNode = {
+export type TextNode = {
     type:
         | 'h1'
         | 'h2'
@@ -16,7 +16,17 @@ export type ParentNode = {
         | 'blockquote'
         | 'code'
         | 'hr';
-    children: ChildNode[];
+    text: string;
+    format?: Section[];
+};
+
+export type Section = {
+    start: number;
+    end: number;
+    bold?: boolean;
+    italic?: boolean;
+    code?: boolean;
+    style?: string;
 };
 
 export type ChildNode = {
@@ -31,6 +41,7 @@ export type RichSelectionRange = {
     start: Index;
     end: Index;
     length: number;
+    totalOffset: number;
 };
 
 export type Index = {
