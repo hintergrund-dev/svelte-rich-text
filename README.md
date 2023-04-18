@@ -2,9 +2,10 @@
 
 A rich editor, different than most others, because in it's object representation it separates the text from the formatting.
 It is aspiring to become the most minimalistic most customizable rich-text-editor of all time.
-It's bundle size is only 7.2 kB!!!
 
-!!! Attention the editor is not production ready and still contains some known bugs !!!
+**It's bundle size is only 8.1 kB!**
+
+_!!! Attention the editor is not production ready and still contains some known bugs !!!_
 
 ## Demo
 
@@ -57,7 +58,7 @@ In order to use it use it like any other svelte store:
     import { RichEditor, html } from 'svelte-rich-text';
 
     html.subscribe((value) => {
-        saveHtml(value)
+        // do something with the html value
     });
 </script>
 <div>
