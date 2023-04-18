@@ -15,12 +15,12 @@
                 {
                     start: 20,
                     end: 29,
-                    italic: true,
+                    i: true,
                 },
                 {
                     start: 103,
                     end: 127,
-                    bold: true,
+                    b: true,
                 },
             ],
         },
@@ -31,8 +31,8 @@
                 {
                     start: 29,
                     end: 46,
-                    italic: true,
-                    bold: true,
+                    i: true,
+                    b: true,
                 },
             ],
         },
@@ -45,14 +45,27 @@
 
 <RichEditor content={startContent} />
 
+<br />
 Object: <br />
-<pre>{JSON.stringify($object, null, 2)}</pre>
+<pre class="code">{JSON.stringify($object, null, 2)}</pre>
 
 Html:<br />
-{$html}
+<pre class="code">
+    {$html}
+</pre>
 
 <style>
     :global(body) {
         font-family: sans-serif;
+    }
+    .code {
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 10px;
+        line-height: 1.4;
+        padding: 10px;
+        white-space: pre-wrap;
     }
 </style>

@@ -1,9 +1,9 @@
 <script>
     import { onMount } from 'svelte';
     import { tick } from 'svelte';
-    import { html, object } from '$lib/stores';
+    import { html, object } from './stores';
 
-    /** @type {import('$lib/types').RichObject} */
+    /** @type {import('./types').RichObject} */
     export let content;
 
     /** @type {HTMLDivElement | null} */
@@ -12,16 +12,16 @@
     /** @type {Selection | null}*/
     let selection = null;
 
-    /** @type {import('$lib/types').RichSelectionRange | undefined}*/
+    /** @type {import('./types').RichSelectionRange | undefined}*/
     let richSelection;
 
     $: if (liveObject) html.set(objectToHtml(liveObject));
     $: if (richObject) object.set(richObject);
 
-    /** @type {import('$lib/types').RichObject} */
+    /** @type {import('./types').RichObject} */
     let richObject;
 
-    /** @type {import('$lib/types').RichObject} */
+    /** @type {import('./types').RichObject} */
     let liveObject;
 
     function handleSelectionChange() {
@@ -175,7 +175,7 @@
         }
     }
 
-    /** @param {import('$lib/types').TextNode['type']} type */
+    /** @param {import('./types').TextNode['type']} type */
     function updateNodeType(type) {
         if (!richSelection) {
             return;
@@ -193,7 +193,7 @@
         richObject = richObject;
     }
 
-    /** @param {import('$lib/types').HtmlFormat} action */
+    /** @param {import('./types').HtmlFormat} action */
     async function updateStyle(action) {
         if (!richSelection) {
             return;
@@ -226,7 +226,7 @@
         setSelection();
     }
 
-    /** @param {import('$lib/types').HtmlFormat} action
+    /** @param {import('./types').HtmlFormat} action
      * @param {number} totalOffset
      * @param {number} length
      * @param {number} objIndex
@@ -464,7 +464,7 @@
         }
     }
 
-    /** @param {import('$lib/types').RichObject} object */
+    /** @param {import('./types').RichObject} object */
     function objectToHtml(object) {
         let html = '';
         for (const node of object) {
