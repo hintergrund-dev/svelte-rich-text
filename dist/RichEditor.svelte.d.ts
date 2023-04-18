@@ -4,6 +4,8 @@
 export default class RichEditor extends SvelteComponentTyped<{
     content: import("./types").RichObject;
 }, {
+    mousedown: MouseEvent;
+} & {
     [evt: string]: CustomEvent<any>;
 }, {}> {
 }
@@ -16,6 +18,8 @@ declare const __propDef: {
         content: import('./types').RichObject;
     };
     events: {
+        mousedown: MouseEvent;
+    } & {
         [evt: string]: CustomEvent<any>;
     };
     slots: {};

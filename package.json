@@ -1,7 +1,7 @@
 {
     "name": "svelte-rich-text",
     "license": "MIT",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "description": "A Svelte rich text editor component",
     "author": "Max Elia Schweigkofler",
     "repository": {

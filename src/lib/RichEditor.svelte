@@ -193,13 +193,16 @@
         richObject = richObject;
     }
 
-    /** @param {import('$lib/types').HtmlFormat} action */
-    async function updateStyle(action) {
+    /**
+     * @param {import('$lib/types').HtmlFormat} action
+     * @param {string | undefined} attribute
+     */
+    async function updateStyle(action, attribute = undefined) {
         if (!richSelection) {
             return;
         }
         if (richSelection.start.index === richSelection.end.index) {
-            updateObject(action, richSelection.totalOffset, richSelection.length, richSelection.start.index);
+            updateObject(action, richSelection.totalOffset, richSelection.length, richSelection.start.index, attribute);
         } else {
             // Update first object
             updateObject(
@@ -207,15 +210,16 @@
                 richSelection.totalOffset,
                 richObject[richSelection.start.index].text.length - richSelection.start.offset,
                 richSelection.start.index,
+                attribute,
             );
 
             // Update middle objects
             for (let i = richSelection.start.index + 1; i < richSelection.end.index; i++) {
-                updateObject(action, 0, richObject[i].text.length, i);
+                updateObject(action, 0, richObject[i].text.length, i, attribute);
             }
 
             // Update last object
-            updateObject(action, 0, richSelection.end.offset, richSelection.end.index);
+            updateObject(action, 0, richSelection.end.offset, richSelection.end.index, attribute);
         }
         cleanObject();
         liveObject = richObject;
@@ -230,8 +234,9 @@
      * @param {number} totalOffset
      * @param {number} length
      * @param {number} objIndex
+     * @param {string | undefined} attribute
      */
-    function updateObject(action, totalOffset, length, objIndex) {
+    function updateObject(action, totalOffset, length, objIndex, attribute = undefined) {
         let updateObject = richObject[objIndex];
 
         if (!updateObject.format) {
@@ -240,7 +245,7 @@
                 {
                     start: totalOffset,
                     end: totalOffset + length,
-                    [action]: true,
+                    [action]: attribute ?? true,
                 },
             ];
             return;
@@ -261,7 +266,7 @@
             updateObject.format.push({
                 start: totalOffset,
                 end: totalOffset + length,
-                [action]: true,
+                [action]: attribute ?? true,
             });
             return;
         }
@@ -271,19 +276,18 @@
             updateObject.format.splice(insertIndex, 0, {
                 start: totalOffset,
                 end: totalOffset + length,
-                [action]: true,
+                [action]: attribute ?? true,
             });
             return;
         }
 
         let actionValue = !(action in updateObject.format[insertIndex]) && !updateObject.format[insertIndex][action];
-
         if (updateObject.format[insertIndex].start <= totalOffset && updateObject.format[insertIndex].end >= totalOffset + length) {
             if (updateObject.format[insertIndex]?.start === totalOffset && updateObject.format[insertIndex]?.end === totalOffset + length) {
                 // Selection (range) is same as existing element
                 // Format object stays the same
                 if (actionValue) {
-                    updateObject.format[insertIndex][action] = actionValue;
+                    updateObject.format[insertIndex][action] = attribute ?? actionValue;
                 } else {
                     delete updateObject.format[insertIndex][action];
                 }
@@ -294,7 +298,7 @@
                 oldFormat.start = updateObject.format[insertIndex].end = totalOffset + length;
 
                 if (actionValue) {
-                    updateObject.format[insertIndex][action] = actionValue;
+                    updateObject.format[insertIndex][action] = attribute ?? actionValue;
                     updateObject.format.splice(insertIndex + 1, 0, oldFormat);
                 } else {
                     delete updateObject.format[insertIndex][action];
@@ -306,7 +310,7 @@
                 oldFormat.end = updateObject.format[insertIndex].start = totalOffset;
 
                 if (actionValue) {
-                    updateObject.format[insertIndex][action] = actionValue;
+                    updateObject.format[insertIndex][action] = attribute ?? actionValue;
                     updateObject.format.splice(insertIndex, 0, oldFormat);
                 } else {
                     delete updateObject.format[insertIndex][action];
@@ -320,7 +324,7 @@
                 oldFormatEnd.start = updateObject.format[insertIndex].end = totalOffset + length;
 
                 if (actionValue) {
-                    updateObject.format[insertIndex][action] = actionValue;
+                    updateObject.format[insertIndex][action] = attribute ?? actionValue;
                     updateObject.format.splice(insertIndex, 0, oldFormatStart);
                     updateObject.format.splice(insertIndex + 2, 0, oldFormatEnd);
                 } else {
@@ -346,7 +350,7 @@
                 if (updateObject.format[insertIndex]?.start === totalOffset) {
                     // Format object is not split at start
                     if (actionValue) {
-                        updateObject.format[insertIndex][action] = actionValue;
+                        updateObject.format[insertIndex][action] = attribute ?? actionValue;
                     } else {
                         delete updateObject.format[insertIndex][action];
                     }
@@ -356,7 +360,7 @@
                     oldFormat.end = updateObject.format[insertIndex].start = totalOffset;
 
                     if (actionValue) {
-                        updateObject.format[insertIndex][action] = actionValue;
+                        updateObject.format[insertIndex][action] = attribute ?? actionValue;
                         updateObject.format.splice(insertIndex, 0, oldFormat);
                     } else {
                         delete updateObject.format[insertIndex][action];
@@ -374,7 +378,7 @@
                             [action]: true,
                         });
                     } else {
-                        updateObject.format[insertIndex][action] = actionValue;
+                        updateObject.format[insertIndex][action] = attribute ?? actionValue;
                     }
                 } else {
                     delete updateObject.format[insertIndex][action];
@@ -411,7 +415,7 @@
                 oldFormat.start = updateObject.format[insertIndex].end = totalOffset + length;
 
                 if (actionValue) {
-                    updateObject.format[insertIndex][action] = actionValue;
+                    updateObject.format[insertIndex][action] = attribute ?? actionValue;
                     updateObject.format.splice(insertIndex + 1, 0, oldFormat);
                 } else {
                     delete updateObject.format[insertIndex][action];
@@ -485,7 +489,12 @@
             for (const prop in format) {
                 if (prop === 'start' || prop === 'end') continue;
                 if (format[prop]) {
-                    formatStartTag += `<${prop}>`;
+                    if (prop === 'a') {
+                        formatStartTag += `<a href="${format[prop]}">`;
+                        formatEndTag = `</a>` + formatEndTag;
+                    } else {
+                        formatStartTag += `<${prop}>`;
+                    }
                     formatEndTag = `</${prop}>` + formatEndTag;
                 }
             }
@@ -622,6 +631,10 @@
         }
     }
 
+    let linkWidged = false;
+    let linkText = '';
+    let linkSelection = richSelection;
+
     onMount(() => {
         document.addEventListener('selectionchange', handleSelectionChange);
         liveObject = content;
@@ -645,6 +658,43 @@
             <option value="blockquote">Blockquote</option>
             <option value="code">Code</option>
         </select>
+        <button
+            class="link"
+            on:click={() => {
+                linkSelection = richSelection;
+                linkWidged = true;
+            }}
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="icon icon-tabler icon-tabler-link"
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M9 15l6 -6" />
+                <path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464" />
+                <path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463" />
+            </svg>
+        </button>
+        {#if linkWidged}
+            <div class="link-widget">
+                <input on:mousedown|stopPropagation type="text" bind:value={linkText} placeholder="Link" />
+                <button
+                    on:click={() => {
+                        richSelection = linkSelection;
+                        updateStyle('a', linkText);
+                        linkWidged = false;
+                    }}>Add</button
+                >
+            </div>
+        {/if}
     </div>
 
     <div id="editor" bind:this={editor} contenteditable="true" on:input={updateText}>
@@ -667,6 +717,7 @@
     .toolbar {
         display: flex;
         align-items: center;
+        position: relative;
         border-bottom: 1px solid #ccc;
         padding: 1rem;
     }
@@ -697,5 +748,39 @@
     select:focus {
         border-color: #0077cc;
         outline: none;
+    }
+
+    button.link {
+        display: flex;
+        align-items: center;
+    }
+
+    .link-widget {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+
+    .link-widget input {
+        margin-right: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 5px;
+    }
+
+    .link-widget button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
     }
 </style>

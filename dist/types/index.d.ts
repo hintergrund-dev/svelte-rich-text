@@ -9,7 +9,7 @@ export type TextNode = {
 export type FormatSection = {
     start: number;
     end: number;
-} & { [key in HtmlFormat]?: boolean | undefined };
+} & { [key in HtmlFormat]?: boolean | string | undefined };
 
 export type HtmlFormat = 'b' | 'i' | 'code' | 'u' | 'span' | 'a' | 'img';
 
